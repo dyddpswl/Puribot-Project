@@ -49,7 +49,7 @@ npx.cmd --yes vercel@54.4.1 dev --local --listen 127.0.0.1:3000
 - `api/index.py`: Python FastAPI 앱과 OpenAI 호출
 - `data/questions.json`: 기존 20문항 데이터
 - `public/index.html`, `public/style.css`, `public/app.js`: 반응형 웹 화면
-- `vercel.json`: `/api/*`를 Python 서버리스 함수로 전달
+- `vercel.json`: Vercel FastAPI 프레임워크 설정
 - `tests/test_api.py`: 기본 API 테스트
 
 ## 주의
