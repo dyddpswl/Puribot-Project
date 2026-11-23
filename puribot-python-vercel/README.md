@@ -4,39 +4,40 @@
 
 ## 실행
 
-Python 3.11+ 권장.
+Git 저장소 루트에서 `puribot-python-vercel`로 이동한 뒤 실행합니다. Python 3.12를 권장합니다.
 
-```bash
+```powershell
+cd puribot-python-vercel
 python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m compileall -q api tests
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
 환경변수 `OPENAI_API_KEY`를 설정하면 AI를 사용합니다. 키가 없으면 데모용 기본 안내가 표시되며 실제 풀이 분석이 아닙니다.
 
-로컬에서는 두 개의 터미널로 실행할 수 있습니다.
+FastAPI만 실행하고 `http://127.0.0.1:8000/api/health`에서 API 상태를 확인할 수 있습니다.
 
-```bash
-# 터미널 1 — Python API
-uvicorn api.index:app --reload --port 8000
-# 터미널 2 — 정적 화면 (API와 동일 출처가 아니므로 프록시 필요)
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn api.index:app --reload --port 8000
 ```
 
-**권장 로컬 실행:** Vercel CLI를 설치하고 `vercel dev`를 실행하면 정적 화면과 `/api/*` 경로를 함께 테스트할 수 있습니다.
+정적 화면과 API를 함께 테스트하려면 Node.js와 `uv`가 설치된 상태에서 같은 폴더의 PowerShell에서 실행합니다. `--local`은 Vercel 계정 연결 없이 실행합니다.
 
-```bash
-npm install -g vercel
-vercel login
-vercel dev
+```powershell
+$env:Path = "$PWD\.venv\Scripts;$env:Path"
+uv --version
+npx.cmd --yes vercel@54.4.1 dev --local --listen 127.0.0.1:3000
 ```
+
+브라우저에서 `http://127.0.0.1:3000/`을 열고 문항 검색과 6단계 학습을 확인합니다.
 
 ## GitHub → Vercel
 
 1. GitHub **Private** 저장소 생성. `.env`, `.env.local`, API 키, 학생 개인정보를 업로드하지 마세요.
 2. 프로젝트 폴더 전체를 GitHub에 push합니다.
 3. Vercel의 Add New Project에서 해당 저장소를 Import합니다.
-4. Root Directory는 이 프로젝트의 최상위 폴더로 설정합니다.
+4. Import 화면에서 **Root Directory → Edit**를 선택하고, 저장소 기준 경로인 **`puribot-python-vercel`**을 지정합니다. 이미 연결한 프로젝트는 **Settings → Build and Deployment → Root Directory**에서 같은 값을 저장한 뒤 다시 배포합니다.
 5. Vercel Environment Variables에 `OPENAI_API_KEY`, `OPENAI_MODEL`을 등록합니다.
 6. 배포 후 `/api/health`가 `ok: true`를 반환하는지 확인합니다.
 7. `/`에서 문항 검색, AI 분석, 힌트, 자기성찰, 추천을 확인합니다.

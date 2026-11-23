@@ -20,7 +20,18 @@ if(stage===0){$('goal').value=state.goal;$('goal').onchange=e=>{state.goal=e.tar
 if(stage===1){$('attempt').oninput=e=>{state.attempt=e.target.value;store()};$('analyze').onclick=()=>{if(!state.attempt.trim())return alert('풀이 과정을 먼저 입력해 주세요.');coach('analyze')};$('hint').onclick=()=>{state.hints=Math.min(3,state.hints+1);store();coach('hint',state.hints);$('hint').textContent=state.hints>=3?'3단계 힌트 다시 보기':`단계별 힌트 ${state.hints+1}/3`}}
 if(stage===3)$('retry').oninput=e=>{state.retry=e.target.value;store()};
 if(stage===4){$('errorType').value=state.errorType;$('errorType').onchange=e=>{state.errorType=e.target.value;store()};$('reflection').oninput=e=>{state.reflection=e.target.value;store()};$('after').oninput=e=>{$('aval').textContent=e.target.value;state.after=Number(e.target.value);store()}}
-if(stage===5){$('recommend').onclick=async()=>{await coach('recommend');const id=state.recommendation?.recommended_id;if(id){$('go-next').innerHTML=`<p>추천 문항: <strong>${esc(id)}</strong></p><button id="choose">추천 문항 학습하기</button>`;$('choose').onclick=()=>loadQuestion(id)}}}
+if(stage===5){showRecommendation();$('recommend').onclick=async()=>{await coach('recommend');showRecommendation()}}
+}
+function showRecommendation(){
+  const target=$('go-next');
+  if(!target||!state.recommendation)return;
+  const id=state.recommendation.recommended_id;
+  if(!id){
+    target.textContent='같은 주제에서 그림 없이 풀 수 있는 다른 추천 문항이 없습니다.';
+    return;
+  }
+  target.innerHTML=`<p>추천 문항: <strong>${esc(id)}</strong></p><button id="choose">추천 문항 학습하기</button>`;
+  $('choose').onclick=()=>loadQuestion(id);
 }
 $('back').onclick=()=>{state.stage=Math.max(0,state.stage-1);render()};$('next').onclick=()=>{state.stage=(state.stage+1)%6;render()};let timer;$('search').oninput=()=>{clearTimeout(timer);timer=setTimeout(search,220)};
 async function search(){try{const items=await getJSON('/api/questions?q='+encodeURIComponent($('search').value));$('results').innerHTML=items.map(x=>`<button data-id="${esc(x.id)}">${esc(x.id)} · ${esc(x.topic)}${x.hasImage?' (그림 확인 필요)':''}</button>`).join('');$('results').querySelectorAll('button').forEach(b=>b.onclick=()=>loadQuestion(b.dataset.id))}catch(e){$('results').textContent=e.message}}
