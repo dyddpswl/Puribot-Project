@@ -10,19 +10,21 @@ Git 저장소 루트에서 `puribot-python-vercel`로 이동한 뒤 실행합니
 cd puribot-python-vercel
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-.\.venv\Scripts\python.exe -m compileall -q api tests
+.\.venv\Scripts\python.exe -m compileall -q api tests local.py
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
 환경변수 `OPENAI_API_KEY`를 설정하면 AI를 사용합니다. 키가 없으면 데모용 기본 안내가 표시되며 실제 풀이 분석이 아닙니다.
 
-FastAPI만 실행하고 `http://127.0.0.1:8000/api/health`에서 API 상태를 확인할 수 있습니다.
+Uvicorn으로 푸리봇 웹 화면과 FastAPI를 함께 실행할 수 있습니다.
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn api.index:app --reload --port 8000
+.\.venv\Scripts\python.exe -m uvicorn local:app --reload --port 8000
 ```
 
-정적 화면과 API를 함께 테스트하려면 Node.js와 `uv`가 설치된 상태에서 같은 폴더의 PowerShell에서 실행합니다. `--local`은 Vercel 계정 연결 없이 실행합니다.
+브라우저에서 `http://127.0.0.1:8000/`을 열어 학습 화면을 확인합니다. API 상태는 `http://127.0.0.1:8000/api/health`에서 확인합니다.
+
+Vercel 환경도 로컬에서 확인하려면 Node.js와 `uv`가 설치된 상태에서 같은 폴더의 PowerShell에서 실행합니다. `--local`은 Vercel 계정 연결 없이 실행합니다.
 
 ```powershell
 $env:Path = "$PWD\.venv\Scripts;$env:Path"
